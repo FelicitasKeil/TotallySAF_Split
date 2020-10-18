@@ -103,6 +103,12 @@ for i in range(int(XSAF_choices["VRS_bins"])):
 
 os.chdir("../")
 
+#Checking if empty directories exist.
+if not os.path.exists("SpecSAF/tmp_F"):
+	os.makedirs("SpecSAF/tmp_F")
+if not os.path.exists("XSAF_C/output"):
+	os.makedirs("XSAF_C/output")
+
 #Call XSAF C++ version.
 if(Codes_choices["XSAF_ch"] == '0'):
 	os.chdir("XSAF_C")
