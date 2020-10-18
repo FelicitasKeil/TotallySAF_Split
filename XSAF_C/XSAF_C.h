@@ -1,6 +1,7 @@
 //Import libraries
 #include <cmath>
 #include <chrono>
+#include <cmath> 
 #include <fstream>
 #include <iomanip>
 #include <iostream>

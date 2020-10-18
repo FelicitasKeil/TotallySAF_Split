@@ -35,7 +35,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = QTLauncher1.0.0
-DISTDIR = /Users/Safir/TotallySAF_Alpha/QTLauncher/.tmp/QTLauncher1.0.0
+DISTDIR = /Users/Safir/TotallySAF/QTLauncher/.tmp/QTLauncher1.0.0
 LINK          = /Library/Developer/CommandLineTools/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -Wl,-syslibroot,/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mmacosx-version-min=10.10 -Wl,-rpath,@executable_path/Frameworks -Wl,-rpath,/Users/Safir/anaconda3/lib
 LIBS          = $(SUBLIBS) -L/Users/Safir/anaconda3/lib -lQt5Widgets -framework DiskArbitration -framework IOKit -lQt5Gui -lQt5Core -framework OpenGL -framework AGL 
@@ -843,7 +843,7 @@ moc_window.cpp: ../../anaconda3/include/qt/QtWidgets/QWidget \
 		window.h \
 		moc_predefs.h \
 		../../anaconda3/bin/moc
-	/Users/Safir/anaconda3/bin/moc $(DEFINES) --include ./moc_predefs.h -I/Users/Safir/anaconda3/mkspecs/macx-clang -I/Users/Safir/TotallySAF_Alpha/QTLauncher -I/Users/Safir/TotallySAF_Alpha/QTLauncher -I/Users/Safir/anaconda3/include/qt -I/Users/Safir/anaconda3/include/qt/QtWidgets -I/Users/Safir/anaconda3/include/qt/QtGui -I/Users/Safir/anaconda3/include/qt/QtCore -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include window.h -o moc_window.cpp
+	/Users/Safir/anaconda3/bin/moc $(DEFINES) --include ./moc_predefs.h -I/Users/Safir/anaconda3/mkspecs/macx-clang -I/Users/Safir/TotallySAF/QTLauncher -I/Users/Safir/TotallySAF/QTLauncher -I/Users/Safir/anaconda3/include/qt -I/Users/Safir/anaconda3/include/qt/QtWidgets -I/Users/Safir/anaconda3/include/qt/QtGui -I/Users/Safir/anaconda3/include/qt/QtCore -I/Library/Developer/CommandLineTools/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include window.h -o moc_window.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:

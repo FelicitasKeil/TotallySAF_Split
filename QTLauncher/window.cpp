@@ -1506,7 +1506,7 @@ void Window::Parameters_set(){
     UseWLAia->addItem("Yes");
     UseWLAia->addItem("No");
     FidWLAia = new QDoubleSpinBox; FidWLAia->setDecimals(8);
-    FidWLAia->setRange(-10.0, 10.0); FidWLAia->setSingleStep(0.01); FidWLAia->setValue(VFidWLAia);
+    FidWLAia->setRange(-10.0, 10.0); FidWLAia->setSingleStep(0.01); FidWLAia->setValue(1.72);
     StepWLAia = new QDoubleSpinBox; StepWLAia->setDecimals(8);
     StepWLAia->setRange(0.00000001, 1.0); StepWLAia->setSingleStep(0.0001); StepWLAia->setValue(VStepWLAia);
 
@@ -1700,8 +1700,8 @@ void Window::Parameters_set(){
     spinBoxLayout->addWidget(UseGCspecbiasLabel, 12, 0); spinBoxLayout->addWidget(UseGCspecbias, 12, 1); spinBoxLayout->addWidget(StepGCspecbias, 12, 3);
     spinBoxLayout->addWidget(UseGCspecPSLabel, 13, 0); spinBoxLayout->addWidget(UseGCspecPS, 13, 1); spinBoxLayout->addWidget(StepGCspecPS, 13, 3);
     spinBoxLayout->addWidget(UseWLAiaLabel, 14, 0); spinBoxLayout->addWidget(UseWLAia, 14, 1); spinBoxLayout->addWidget(FidWLAia, 14, 2); spinBoxLayout->addWidget(StepWLAia, 14, 3);
-    spinBoxLayout->addWidget(UseWLBiaLabel, 15, 0); spinBoxLayout->addWidget(UseWLBia, 15, 1); spinBoxLayout->addWidget(FidWLBia, 15, 2); spinBoxLayout->addWidget(StepWLBia, 15, 3);
-    spinBoxLayout->addWidget(UseWLniaLabel, 16, 0); spinBoxLayout->addWidget(UseWLnia, 16, 1); spinBoxLayout->addWidget(FidWLnia, 16, 2); spinBoxLayout->addWidget(StepWLnia, 16, 3);
+    spinBoxLayout->addWidget(UseWLBiaLabel, 15, 0); spinBoxLayout->addWidget(UseWLnia, 15, 1); spinBoxLayout->addWidget(FidWLnia, 15, 2); spinBoxLayout->addWidget(StepWLnia, 15, 3);
+    spinBoxLayout->addWidget(UseWLniaLabel, 16, 0); spinBoxLayout->addWidget(UseWLBia, 16, 1); spinBoxLayout->addWidget(FidWLBia, 16, 2); spinBoxLayout->addWidget(StepWLBia, 16, 3);
     spinBoxLayout->addWidget(UseWLCiaLabel, 17, 0); spinBoxLayout->addWidget(FidWLCia, 17, 2);
     spinBoxLayout->addWidget(UseGCphotbiasLabel, 18, 0); spinBoxLayout->addWidget(UseGCphotbias, 18, 1); spinBoxLayout->addWidget(StepGCphotbias, 18, 3);
     spinBoxLayout->addWidget(lnDaLabel, 19, 0); spinBoxLayout->addWidget(lnHLabel, 20, 0); spinBoxLayout->addWidget(lnfsigma8Label, 21, 0);

@@ -199,12 +199,12 @@ XC::XC(int D1, int D2, int D_l, double l_min, double lmaxWL, double lmaxGC, int 
 
     for(int i=1; i<red_B; i++){
         z_ip.push_back(z_im[i]);
+
     }
     z_ip.push_back(zmax);
 
     for(int i=0; i<red_B; i++){
         zrange.push_back((z_ip[i]+z_im[i])/2);
-        cout<<zrange[i]<<endl;
     }
 
     for(int i=0; i < D1; i++){
@@ -569,6 +569,7 @@ void XC::background(){
 			DG_tab[i] = DGrowth(z_win[i], h[2], Omega_m[2], Omega_DE[2], w0[2], wa[2], gamma[2], curvature);
 			RT_tab[i] = R_tab[i]/(c/(100*h[2]));
 		}
+
 		E_tab_up[i] = E(z_win[i], h[0], Omega_m[0], Omega_DE[0], w0[0], wa[0], curvature);
 		E_tab_dw[i] = E(z_win[i], h[3], Omega_m[3], Omega_DE[3], w0[3], wa[3], curvature);
 		R_tab_up[i] = chi_R(z_win[i], h[0], Omega_m[0], Omega_DE[0], w0[0], wa[0], c, curvature);
@@ -577,7 +578,7 @@ void XC::background(){
 		RT_tab_dw[i] = R_tab_dw[i]/(c/(100*h[3]));
 		DG_tab_up[i] = DGrowth(z_win[i], h[0], Omega_m[0], Omega_DE[0], w0[0], wa[0], gamma[0], curvature);
 		DG_tab_dw[i] = DGrowth(z_win[i], h[3], Omega_m[3], Omega_DE[3], w0[3], wa[3], gamma[3], curvature);
-    }
+	}
 	progress = barometer(progress, NP);
 }
 
@@ -595,7 +596,7 @@ double XC::P_phot(double z, double zp){
 void XC::photoz(){
     cout<<"Computing the Photo-z (1st iteration only)..."<<endl;
 	ofstream myfile;
-	double z_p, z_m; vector<vector<double>> zp; int I_prec = 500;
+	double z_p, z_m; vector<vector<double>> zp; int I_prec = 10000;
 	double Trap; double Trap_Z;
 	vector<double> delta_zp; vector<vector<double>> TZ; vector<double> TTZ;
 	myfile.open("Pz_Table_10000.txt");
@@ -616,7 +617,6 @@ void XC::photoz(){
 				Trap += (7.*(P_phot(z_win[i], zp[j][k])+(P_phot(z_win[i], zp[j][k-1]))) + 32.*(P_phot(z_win[i], 1./4*(3.*zp[j][k]+zp[j][k-1])) + P_phot(z_win[i], 1./4*(zp[j][k]+3.*zp[j][k-1]))) + 12*(P_phot(z_win[i], 1./2*(zp[j][k]+zp[j][k-1]))));
 			}
 			Trap *= delta_zp[j]/90*nz(z_win[i]);
-
 
 			for(int m=0; m<MMM; m++){
 				TZ.push_back(vector<double>());
@@ -687,13 +687,12 @@ void XC::windows(){
 				W_tab_up[i][j] += 7.*(Photoz_tab[k][j]*(1. - RT_tab_up[i]/RT_tab_up[k]) + Photoz_tab[k+4][j]*(1. - RT_tab_up[i]/RT_tab_up[k+4])) + 32.*(Photoz_tab[k+3][j]*(1. - RT_tab_up[i]/RT_tab_up[k+3]) + Photoz_tab[k+1][j]*(1. - RT_tab_up[i]/RT_tab_up[k+1])) + 12.*(Photoz_tab[k+2][j]*(1. - RT_tab_up[i]/RT_tab_up[k+2]));
 				W_tab_dw[i][j] += 7.*(Photoz_tab[k][j]*(1. - RT_tab_dw[i]/RT_tab_dw[k]) + Photoz_tab[k+4][j]*(1. - RT_tab_dw[i]/RT_tab_dw[k+4])) + 32.*(Photoz_tab[k+3][j]*(1. - RT_tab_dw[i]/RT_tab_dw[k+3]) + Photoz_tab[k+1][j]*(1. - RT_tab_dw[i]/RT_tab_dw[k+1])) + 12.*(Photoz_tab[k+2][j]*(1. - RT_tab_dw[i]/RT_tab_dw[k+2]));
 			}
-
 			if(paramo==0){
 				W_tab[i][j] *= 1.5*100.*h[2]*Omega_m[2]*(1.+z_win[i])/c*RT_tab[i]/90*delta_zwin;
 			}
 			W_tab_up[i][j] *= 1.5*100.*h[0]*Omega_m[0]*(1.+z_win[i])/c*RT_tab_up[i]/90*delta_zwin;
 			W_tab_dw[i][j] *= 1.5*100.*h[3]*Omega_m[3]*(1.+z_win[i])/c*RT_tab_dw[i]/90*delta_zwin;
-        }
+		}
 	}
 	progress = barometer(progress, NP);
 }
@@ -818,7 +817,7 @@ void XC::C_l_computing(){
 					if(paramo == 0){
 						for(int k=0; k<z_win.size()-4; k+=4){ 
 							C_ij_LL[aa][bb] += c/(100.*h[2])*delta_zpm/90*(7.*(W_tab[k][aa]*W_tab[k][bb]/(E_tab[k]*pow(R_tab[k],2))*Pk_conv[k] + W_tab[k+4][aa]*W_tab[k+4][bb]/(E_tab[k+4]*pow(R_tab[k+4],2))*Pk_conv[k+4]) + 32.*(W_tab[k+1][aa]*W_tab[k+1][bb]/(E_tab[k+1]*pow(R_tab[k+1],2))*Pk_conv[k+1] + W_tab[k+3][aa]*W_tab[k+3][bb]/(E_tab[k+3]*pow(R_tab[k+3],2))*Pk_conv[k+3]) + 12.*(W_tab[k+2][aa]*W_tab[k+2][bb]/(E_tab[k+2]*pow(R_tab[k+2],2))*Pk_conv[k+2])
-                            + 7.*((W_tab[k][aa]*WIA_tab[k][bb] + WIA_tab[k][aa]*W_tab[k][bb])/(E_tab[k]*pow(R_tab[k],2))*(-A_IA[2]*C_IA[2]*Omega_m[2]/DG_tab[k]*pow(1.+z_win[k],n_IA[2])*pow(lum_mean[k],B_IA[2])*Pk_conv[k])
+							+ 7.*((W_tab[k][aa]*WIA_tab[k][bb] + WIA_tab[k][aa]*W_tab[k][bb])/(E_tab[k]*pow(R_tab[k],2))*(-A_IA[2]*C_IA[2]*Omega_m[2]/DG_tab[k]*pow(1.+z_win[k],n_IA[2])*pow(lum_mean[k],B_IA[2])*Pk_conv[k])
 							+ (W_tab[k+4][aa]*WIA_tab[k+4][bb] + WIA_tab[k+4][aa]*W_tab[k+4][bb])/(E_tab[k+4]*pow(R_tab[k+4],2))*(-A_IA[2]*C_IA[2]*Omega_m[2]/DG_tab[k+4]*pow(1.+z_win[k+4],n_IA[2])*pow(lum_mean[k+4],B_IA[2])*Pk_conv[k+4]))
 							+ 32.*((W_tab[k+1][aa]*WIA_tab[k+1][bb] + WIA_tab[k+1][aa]*W_tab[k+1][bb])/(E_tab[k+1]*pow(R_tab[k+1],2))*(-A_IA[2]*C_IA[2]*Omega_m[2]/DG_tab[k+1]*pow(1.+z_win[k+1],n_IA[2])*pow(lum_mean[k+1],B_IA[2])*Pk_conv[k+1])
 							+ (W_tab[k+3][aa]*WIA_tab[k+3][bb] + WIA_tab[k+3][aa]*W_tab[k+3][bb])/(E_tab[k+3]*pow(R_tab[k+3],2))*(-A_IA[2]*C_IA[2]*Omega_m[2]/DG_tab[k+3]*pow(1.+z_win[k+3],n_IA[2])*pow(lum_mean[k+3],B_IA[2])*Pk_conv[k+3]))
