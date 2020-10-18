@@ -1,0 +1,31 @@
+########## CONTOURS PLOT ##########
+
+#Labels and ticks size settings: in  order ticks font size, label font size, legend font size, legend x position, legend y position, legend background color, legend frame line color, legend text color, legend frame line size
+20
+24
+24
+3.
+0.5
+whitesmoke
+blueviolet
+black
+3.
+
+#Fiducial input ($ symbol, name, $ symbol, space, and value):
+$\Omega_{m}$ 0.32
+#$\Omega_{DE}$ 0.68
+$\Omega_{b}$ 0.05
+$w_{0}$ -1.0
+$w_{a}$ 0.0
+$h$ 0.67
+$n_{s}$ 0.96
+$\sigma_{8}$ 0.81553380
+
+#Legend (Does not begin with $ symbol). IMPORTANT: The legend has to be written in the format "Input_file | legend". The legend order corresponds to the alphanumerical order of the files in the F_input directory:
+Fisher_GCph_GCs_WL_XC_TSAF_10bins | Euclid: GCph+GCsp+WL+XC, 10 bins photo & 5 bins spectro, FoM=1227.34
+Fisher_GCph_GCs_WL_XC_TSAF_20bins | Euclid: GCph+GCsp+WL+XC, 20 bins photo & 5 bins spectro, FoM=1420.80
+Fisher_GCph_GCs_WL_XC_TSAF_30bins | Euclid: GCph+GCsp+WL+XC, 30 bins photo & 5 bins spectro, FoM=1532.24
+Fisher_GCph_GCs_WL_XC_TSAF_40bins | Euclid: GCph+GCsp+WL+XC, 40 bins photo & 5 bins spectro, FoM=1596.96
+Fisher_GCph_GCs_WL_XC_TSAF_50bins | Euclid: GCph+GCsp+WL+XC, 50 bins photo & 5 bins spectro, FoM=1624.64
+Fisher_GCph_GCs_WL_XC_TSAF_60bins | Euclid: GCph+GCsp+WL+XC, 60 bins photo & 5 bins spectro, FoM=1651.43
+Fisher_GCph_GCs_WL_XC_TSAF_70bins | Euclid: GCph+GCsp+WL+XC, 70 bins photo & 5 bins spectro, FoM=1613.10

@@ -1,0 +1,2 @@
+Cutting_l_V 60
+SavePrC_ch 0
