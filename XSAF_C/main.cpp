@@ -1,6 +1,6 @@
 /*
 Authors: S.Yahia-Cherif, F.Dournac.
-Last Update 29/06/2020.
+Last Update 03/03/2021.
 This is the main script of XSAF. XSAF computes the photometric Cl and the photometric Fisher matrix
 */
 
@@ -24,6 +24,8 @@ int main(){
     }
     ifile.close();
 
+    int use_GCb=1;
+
     vector<int> PAR_X;
     int PAR_IND = 0;
     for(int i=0; i<elements_0.size(); i++){
@@ -32,6 +34,9 @@ int main(){
                 PAR_X.push_back(PAR_IND);
             }
             PAR_IND++;
+        }
+        if(elements_0[i] == "UseGCphotbias_ch" && elements_1[i] == 0){
+            use_GCb=0;
         }
     }
 
@@ -69,9 +74,11 @@ int main(){
         XSAF_elts[elements_0[i]] = double(elements_1[i]);
     }
 
-    PAR_IND = PAR_X[PAR_X.size()-1]+1;
-    for(int i=PAR_IND; i<PAR_IND + XSAF_elts["VRS_bins"]-1; i++){
-        PAR_X.push_back(i);
+    if(use_GCb == 0){
+        PAR_IND = PAR_X[PAR_X.size()-1]+1;
+        for(int i=PAR_IND; i<PAR_IND + XSAF_elts["VRS_bins"]-1; i++){
+            PAR_X.push_back(i);
+        }
     }
 
     //Reading curvature, zcut and gamma settings.
