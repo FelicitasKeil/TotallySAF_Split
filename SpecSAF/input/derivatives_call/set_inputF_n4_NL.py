@@ -7,8 +7,9 @@
 import numpy as np
 
 #Load the redshift values, the bias and f(z) 
-zrange, b, growth_f = np.loadtxt("../bias_n_growth_baseline.dat",delimiter=' ',usecols = (0,2,4), unpack = True)
-
+zrange, b, growth_f = np.loadtxt("../bias_n_growth_baseline.dat",delimiter=' ',
+                                 usecols = (0,2,4), unpack = True)
+# Redshift Dependency
 N_notRD_params = 6
 N_RD_params = 5
 
