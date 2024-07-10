@@ -151,7 +151,7 @@ N_notRD_params, N_RD_params = 6, 5
 # Loading Camb power spectrums names and Fisher names
 CAMB_IN_L = "Pk_baseline_NBSAF"
 FD_input = "Pk_baseline_NBSAF/fid"
-FD_output = "Big_Fisher_matrix_split"
+FD_output = "Big_Fisher_matrix"
 
 print("Checking ok!")
 
@@ -447,35 +447,55 @@ def P_obs(
     if (choice_L_NL == "L") or (choice_L_NL == "SNL" and choice_SNL1_SNL2 == "SNL1"):
         return 1.0 / (
             q_per(z, er_FDA, er_FDA_ref) ** 2 * q_par(z, er_FH, er_FH_ref)
-        ) * (1.0 / ( 1.0 + (
+        ) * (
+            1.0
+            / (
+                1.0
+                + (
                     frate * k_ref * mu_ref * sigP * DG_growth[i]
-                    / DG_growth[z_mean_index])** 2)) * (
+                    / DG_growth[z_mean_index])** 2)
+        ) * (
             bias_s8 + gf_s8 * mu_ref**2
-        ) ** 2 * (PM
+        ) ** 2 * (
+            PM
             * np.exp(
                 -gmu(z, mu_ref, er_FH, er_FH_ref, er_FDA, er_FDA_ref, sigP, sigV)
                 * k_ref**2
             )
             + PM_NW
-            * (1.0
+            * (
+                1.0
                 - np.exp(
                     -gmu(z, mu_ref, er_FH, er_FH_ref, er_FDA, er_FDA_ref, sigP, sigV)
-                    * k_ref**2))
+                    * k_ref**2
+                )
+            )
         ) * Fz(z, k_ref, mu_ref, er_FH) + P_shot(z)
 
     elif choice_L_NL == "SNL" and choice_SNL1_SNL2 == "SNL2":
         return 1.0 / (
             q_per(z, er_FDA, er_FDA_ref) ** 2 * q_par(z, er_FH, er_FH_ref)
         ) * (1.0 / (1.0 + (gf_s8 * k_ref * mu_ref * sigP) ** 2)) * (
-            bias_s8 + gf_s8 * mu_ref**2) ** 2 * (
-            PM * np.exp(
+            bias_s8 + gf_s8 * mu_ref**2
+        ) ** 2 * (
+            PM
+            * np.exp(
                 -gmu(z, mu_ref, er_FH, er_FH_ref, er_FDA, er_FDA_ref, sigP, sigV)
-                * k_ref**2)
+                * k_ref**2
+            )
             + PM_NW
-            * (1.0
+            * (
+                1.0
                 - np.exp(
                     -gmu(z, mu_ref, er_FH, er_FH_ref, er_FDA, er_FDA_ref, sigP, sigV)
-                    * k_ref**2))) * Fz(z, k_ref, mu_ref, er_FH) + P_shot(z)
+                    * k_ref**2
+                )
+            )
+        ) * Fz(
+            z, k_ref, mu_ref, er_FH
+        ) + P_shot(
+            z
+        )
 
 
 # ln of the observational power spectrum.
@@ -702,11 +722,11 @@ def der_h_3pts(
 ):
     return (
         lnP_obs(
-            k_ref,
+            k_ref * (1.0 + eps_h),
             mu_ref,
             z,
-            10 ** PM_up(np.log10(k_ref)),
-            10 ** PM_NW_up(np.log10(k_ref)),
+            10 ** PM_up(np.log10(k_ref * (1.0 + eps_h))),
+            10 ** PM_NW_up(np.log10(k_ref * (1.0 + eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -717,11 +737,11 @@ def der_h_3pts(
             sigV,
         )
         - lnP_obs(
-            k_ref,
+            k_ref * (1.0 - eps_h),
             mu_ref,
             z,
-            10 ** PM_dw(np.log10(k_ref)),
-            10 ** PM_NW_dw(np.log10(k_ref)),
+            10 ** PM_dw(np.log10(k_ref * (1.0 - eps_h))),
+            10 ** PM_NW_dw(np.log10(k_ref * (1.0 - eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -757,11 +777,11 @@ def der_h_5pts(
 ):
     return (
         lnP_obs(
-            k_ref,
+            k_ref * (1.0 - 2 * eps_h),
             mu_ref,
             z,
-            10 ** PM_dw2(np.log10(k_ref)),
-            10 ** PM_NW_dw2(np.log10(k_ref)),
+            10 ** PM_dw2(np.log10(k_ref * (1 - 2 * eps_h))),
+            10 ** PM_NW_dw2(np.log10(k_ref * (1 - 2 * eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -773,11 +793,11 @@ def der_h_5pts(
         )
         - 8
         * lnP_obs(
-            k_ref,
+            k_ref * (1.0 - eps_h),
             mu_ref,
             z,
-            10 ** PM_dw(np.log10(k_ref)),
-            10 ** PM_NW_dw(np.log10(k_ref)),
+            10 ** PM_dw(np.log10(k_ref * (1 - eps_h))),
+            10 ** PM_NW_dw(np.log10(k_ref * (1 - eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -789,11 +809,11 @@ def der_h_5pts(
         )
         + 8
         * lnP_obs(
-            k_ref,
+            k_ref * (1.0 + eps_h),
             mu_ref,
             z,
-            10 ** PM_up(np.log10(k_ref)),
-            10 ** PM_NW_up(np.log10(k_ref)),
+            10 ** PM_up(np.log10(k_ref * (1 + eps_h))),
+            10 ** PM_NW_up(np.log10(k_ref * (1 + eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -804,11 +824,11 @@ def der_h_5pts(
             sigV,
         )
         - lnP_obs(
-            k_ref,
+            k_ref * (1.0 + 2 * eps_h),
             mu_ref,
             z,
-            10 ** PM_up2(np.log10(k_ref)),
-            10 ** PM_NW_up2(np.log10(k_ref)),
+            10 ** PM_up2(np.log10(k_ref * (1 + 2 * eps_h))),
+            10 ** PM_NW_up2(np.log10(k_ref * (1 + 2 * eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -848,11 +868,11 @@ def der_h_7pts(
 ):
     return (
         -lnP_obs(
-            k_ref,
+            k_ref * (1.0 - 3 * eps_h),
             mu_ref,
             z,
-            10 ** PM_dw3(np.log10(k_ref)),
-            10 ** PM_NW_dw3(np.log10(k_ref)),
+            10 ** PM_dw3(np.log10(k_ref * (1.0 - 3 * eps_h))),
+            10 ** PM_NW_dw3(np.log10(k_ref * (1.0 - 3 * eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -864,11 +884,11 @@ def der_h_7pts(
         )
         + 9
         * lnP_obs(
-            k_ref,
+            k_ref * (1.0 - 2 * eps_h),
             mu_ref,
             z,
-            10 ** PM_dw2(np.log10(k_ref)),
-            10 ** PM_NW_dw2(np.log10(k_ref)),
+            10 ** PM_dw2(np.log10(k_ref * (1.0 - 2 * eps_h))),
+            10 ** PM_NW_dw2(np.log10(k_ref * (1.0 - 2 * eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -880,11 +900,11 @@ def der_h_7pts(
         )
         - 45
         * lnP_obs(
-            k_ref,
+            k_ref * (1.0 - eps_h),
             mu_ref,
             z,
-            10 ** PM_dw(np.log10(k_ref)),
-            10 ** PM_NW_dw(np.log10(k_ref)),
+            10 ** PM_dw(np.log10(k_ref * (1.0 - eps_h))),
+            10 ** PM_NW_dw(np.log10(k_ref * (1.0 - eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -896,11 +916,11 @@ def der_h_7pts(
         )
         + 45
         * lnP_obs(
-            k_ref,
+            k_ref * (1.0 + eps_h),
             mu_ref,
             z,
-            10 ** PM_up(np.log10(k_ref)),
-            10 ** PM_NW_up(np.log10(k_ref)),
+            10 ** PM_up(np.log10(k_ref * (1.0 + eps_h))),
+            10 ** PM_NW_up(np.log10(k_ref * (1.0 + eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -912,11 +932,11 @@ def der_h_7pts(
         )
         - 9
         * lnP_obs(
-            k_ref,
+            k_ref * (1.0 + 2 * eps_h),
             mu_ref,
             z,
-            10 ** PM_up2(np.log10(k_ref)),
-            10 ** PM_NW_up2(np.log10(k_ref)),
+            10 ** PM_up2(np.log10(k_ref * (1.0 + 2 * eps_h))),
+            10 ** PM_NW_up2(np.log10(k_ref * (1.0 + 2 * eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -927,11 +947,11 @@ def der_h_7pts(
             sigV,
         )
         + lnP_obs(
-            k_ref,
+            k_ref * (1.0 + 3 * eps_h),
             mu_ref,
             z,
-            10 ** PM_up3(np.log10(k_ref)),
-            10 ** PM_NW_up3(np.log10(k_ref)),
+            10 ** PM_up3(np.log10(k_ref * (1.0 + 3 * eps_h))),
+            10 ** PM_NW_up3(np.log10(k_ref * (1.0 + 3 * eps_h))),
             bias_s8,
             gf_s8,
             er_FH,
@@ -1484,34 +1504,22 @@ def der_H_7pts(
 ):
 
     # Computing new k, mu coming from the AP effect (for the derivative of lnP_obs over lnH(z)).
-    k_H_up = k(z, mu_ref, k_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_up_2 = k(
-        z, mu_ref, k_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
-    )
-    k_H_up_3 = k(
-        z, mu_ref, k_ref, er_FH ** (1 + 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
-    )
+
     mu_H_up = mu(z, mu_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up_2 = mu(z, mu_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up_3 = mu(z, mu_ref, er_FH ** (1 + 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_dw = k(z, mu_ref, k_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_dw_2 = k(
-        z, mu_ref, k_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
-    )
-    k_H_dw_3 = k(
-        z, mu_ref, k_ref, er_FH ** (1 - 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
-    )
+
     mu_H_dw = mu(z, mu_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw_2 = mu(z, mu_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw_3 = mu(z, mu_ref, er_FH ** (1 - 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
 
     return (
         -lnP_obs(
-            k_H_dw_3,
+            k_ref,
             mu_H_dw_3,
             z,
-            10 ** PM(np.log10(k_H_dw_3)),
-            10 ** PM_NW(np.log10(k_H_dw_3)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - 3 * eps_H),
@@ -1523,11 +1531,11 @@ def der_H_7pts(
         )
         + 9
         * lnP_obs(
-            k_H_dw_2,
+            k_ref,
             mu_H_dw_2,
             z,
-            10 ** PM(np.log10(k_H_dw_2)),
-            10 ** PM_NW(np.log10(k_H_dw_2)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - 2 * eps_H),
@@ -1539,11 +1547,11 @@ def der_H_7pts(
         )
         - 45
         * lnP_obs(
-            k_H_dw,
+            k_ref,
             mu_H_dw,
             z,
-            10 ** PM(np.log10(k_H_dw)),
-            10 ** PM_NW(np.log10(k_H_dw)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - eps_H),
@@ -1555,11 +1563,11 @@ def der_H_7pts(
         )
         + 45
         * lnP_obs(
-            k_H_up,
+            k_ref,
             mu_H_up,
             z,
-            10 ** PM(np.log10(k_H_up)),
-            10 ** PM_NW(np.log10(k_H_up)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + eps_H),
@@ -1571,11 +1579,11 @@ def der_H_7pts(
         )
         - 9
         * lnP_obs(
-            k_H_up_2,
+            k_ref,
             mu_H_up_2,
             z,
-            10 ** PM(np.log10(k_H_up_2)),
-            10 ** PM_NW(np.log10(k_H_up_2)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + 2 * eps_H),
@@ -1586,11 +1594,11 @@ def der_H_7pts(
             sigV,
         )
         + lnP_obs(
-            k_H_up_3,
+            k_ref,
             mu_H_up_3,
             z,
-            10 ** PM(np.log10(k_H_up_3)),
-            10 ** PM_NW(np.log10(k_H_up_3)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + 3 * eps_H),
@@ -1619,26 +1627,19 @@ def der_H_5pts(
     sigV,
 ):
 
-    k_H_up = k(z, mu_ref, k_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_up_2 = k(
-        z, mu_ref, k_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
-    )
     mu_H_up = mu(z, mu_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up_2 = mu(z, mu_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_dw = k(z, mu_ref, k_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_dw_2 = k(
-        z, mu_ref, k_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
-    )
+
     mu_H_dw = mu(z, mu_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw_2 = mu(z, mu_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
 
     return (
         -lnP_obs(
-            k_H_up_2,
+            k_ref,
             mu_H_up_2,
             z,
-            10 ** PM(np.log10(k_H_up_2)),
-            10 ** PM_NW(np.log10(k_H_up_2)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + 2 * eps_H),
@@ -1650,11 +1651,11 @@ def der_H_5pts(
         )
         + 8
         * lnP_obs(
-            k_H_up,
+            k_ref,
             mu_H_up,
             z,
-            10 ** PM(np.log10(k_H_up)),
-            10 ** PM_NW(np.log10(k_H_up)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + eps_H),
@@ -1666,11 +1667,11 @@ def der_H_5pts(
         )
         - 8
         * lnP_obs(
-            k_H_dw,
+            k_ref,
             mu_H_dw,
             z,
-            10 ** PM(np.log10(k_H_dw)),
-            10 ** PM_NW(np.log10(k_H_dw)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - eps_H),
@@ -1681,11 +1682,11 @@ def der_H_5pts(
             sigV,
         )
         + lnP_obs(
-            k_H_dw_2,
+            k_ref,
             mu_H_dw_2,
             z,
-            10 ** PM(np.log10(k_H_dw_2)),
-            10 ** PM_NW(np.log10(k_H_dw_2)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - 2 * eps_H),
@@ -1714,18 +1715,16 @@ def der_H_3pts(
     sigV,
 ):
 
-    k_H_up = k(z, mu_ref, k_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-    k_H_dw = k(z, mu_ref, k_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up = mu(z, mu_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw = mu(z, mu_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
 
     return (
         lnP_obs(
-            k_H_up,
+            k_ref,
             mu_H_up,
             z,
-            10 ** PM(np.log10(k_H_up)),
-            10 ** PM_NW(np.log10(k_H_up)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + eps_H),
@@ -1736,11 +1735,11 @@ def der_H_3pts(
             sigV,
         )
         - lnP_obs(
-            k_H_dw,
+            k_ref,
             mu_H_dw,
             z,
-            10 ** PM(np.log10(k_H_dw)),
-            10 ** PM_NW(np.log10(k_H_dw)),
+            10 ** PM(np.log10(k_ref)),
+            10 ** PM_NW(np.log10(k_ref)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - eps_H),
@@ -4470,8 +4469,7 @@ print("Begin projection")
 
 # Set the fiducial values of the new parameters.
 Omega_b_new = omega_b_fid / (h_fid**2)
-h_new_growth = h_fid
-h_new_geo = h_fid
+h_new = h_fid
 Omega_m_new = omega_m_fid / (h_fid**2)
 sig_p_new = sig_p_fid[0]
 sig_v_new = sig_v_fid[0]
@@ -4521,7 +4519,7 @@ def H_new(z, n_num, ind):
     elif ind == 2:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + n_num * (1 + z) ** 3
@@ -4533,7 +4531,7 @@ def H_new(z, n_num, ind):
     elif ind == 4:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + Omega_m_new * (1 + z) ** 3
@@ -4545,7 +4543,7 @@ def H_new(z, n_num, ind):
     elif ind == 5 or ind == 6:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + Omega_m_new * (1 + z) ** 3
@@ -4557,7 +4555,7 @@ def H_new(z, n_num, ind):
     else:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + Omega_m_new * (1 + z) ** 3
@@ -4583,7 +4581,7 @@ def H_flat(z, n_num, ind):
     elif ind == 2:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + n_num * (1 + z) ** 3
@@ -4594,7 +4592,7 @@ def H_flat(z, n_num, ind):
     elif ind == 5 or ind == 6:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + Omega_m_new * (1 + z) ** 3
@@ -4605,7 +4603,7 @@ def H_flat(z, n_num, ind):
     else:
         return (
             100
-            * h_new_geo
+            * h_new
             * np.sqrt(
                 Omega_r * (1 + z) ** 4
                 + Omega_m_new * (1 + z) ** 3
@@ -4618,14 +4616,14 @@ def chi_aux_new(z, n_num, ind):
     if ind == 1:
         return 100 * n_num / H_new(z, n_num, ind)
     else:
-        return 100 * h_new_geo / H_new(z, n_num, ind)
+        return 100 * h_new / H_new(z, n_num, ind)
 
 
 def chi_aux_new_flat(z, n_num, ind):
     if ind == 1:
         return 100 * n_num / H_flat(z, n_num, ind)
     else:
-        return 100 * h_new_geo / H_flat(z, n_num, ind)
+        return 100 * h_new / H_flat(z, n_num, ind)
 
 
 def chi_new(z, n_num, ind):
@@ -4674,7 +4672,7 @@ def Da_new(z, n_num, ind):
         if 1 - n_num - Omega_L_new - Omega_r > 0:
             return (
                 c
-                / (100 * h_new_geo * (1 + z) * np.sqrt(1 - n_num - Omega_L_new - Omega_r))
+                / (100 * h_new * (1 + z) * np.sqrt(1 - n_num - Omega_L_new - Omega_r))
                 * np.sinh(
                     np.sqrt(1 - n_num - Omega_L_new - Omega_r) * chi_new(z, n_num, ind)
                 )
@@ -4684,7 +4682,7 @@ def Da_new(z, n_num, ind):
                 c
                 / (
                     100
-                    * h_new_geo
+                    * h_new
                     * (1 + z)
                     * np.sqrt(np.fabs(1 - n_num - Omega_L_new - Omega_r))
                 )
@@ -4694,13 +4692,13 @@ def Da_new(z, n_num, ind):
                 )
             )
         else:
-            return c / (100 * h_new_geo * (1 + z)) * chi_new(z, n_num, ind)
+            return c / (100 * h_new * (1 + z)) * chi_new(z, n_num, ind)
 
     elif ind == 4:
         if 1 - Omega_m_new - n_num - Omega_r > 0:
             return (
                 c
-                / (100 * h_new_geo * (1 + z) * np.sqrt(1 - Omega_m_new - n_num - Omega_r))
+                / (100 * h_new * (1 + z) * np.sqrt(1 - Omega_m_new - n_num - Omega_r))
                 * np.sinh(
                     np.sqrt(1 - Omega_m_new - n_num - Omega_r) * chi_new(z, n_num, ind)
                 )
@@ -4710,7 +4708,7 @@ def Da_new(z, n_num, ind):
                 c
                 / (
                     100
-                    * h_new_geo
+                    * h_new
                     * (1 + z)
                     * np.sqrt(np.fabs(1 - Omega_m_new - n_num - Omega_r))
                 )
@@ -4720,7 +4718,7 @@ def Da_new(z, n_num, ind):
                 )
             )
         else:
-            return c / (100 * h_new_geo * (1 + z)) * chi_new(z, n_num, ind)
+            return c / (100 * h_new * (1 + z)) * chi_new(z, n_num, ind)
 
     elif ind == 5 or ind == 6:
         if 1 - Omega_m_new - Omega_L_new - Omega_r > 0:
@@ -4728,7 +4726,7 @@ def Da_new(z, n_num, ind):
                 c
                 / (
                     100
-                    * h_new_geo
+                    * h_new
                     * (1 + z)
                     * np.sqrt(1 - Omega_m_new - Omega_L_new - Omega_r)
                 )
@@ -4742,7 +4740,7 @@ def Da_new(z, n_num, ind):
                 c
                 / (
                     100
-                    * h_new_geo
+                    * h_new
                     * (1 + z)
                     * np.sqrt(np.fabs(1 - Omega_m_new - Omega_L_new - Omega_r))
                 )
@@ -4752,10 +4750,10 @@ def Da_new(z, n_num, ind):
                 )
             )
         else:
-            return c / (100 * h_new_geo * (1 + z)) * chi_new(z, n_num, ind)
+            return c / (100 * h_new * (1 + z)) * chi_new(z, n_num, ind)
 
     else:
-        return c / (100 * h_new_geo * (1 + z)) * chi_new(z, n_num, ind)
+        return c / (100 * h_new * (1 + z)) * chi_new(z, n_num, ind)
 
 
 def Da_flat(z, n_num, ind):
@@ -4764,13 +4762,13 @@ def Da_flat(z, n_num, ind):
         return c / (100 * n_num * (1 + z)) * chi_new_flat(z, n_num, ind)
 
     elif ind == 2:
-        return c / (100 * h_new_geo * (1 + z)) * chi_new_flat(z, n_num, ind)
+        return c / (100 * h_new * (1 + z)) * chi_new_flat(z, n_num, ind)
 
     elif ind == 5 or ind == 6:
-        return c / (100 * h_new_geo * (1 + z)) * chi_new_flat(z, n_num, ind)
+        return c / (100 * h_new * (1 + z)) * chi_new_flat(z, n_num, ind)
 
     else:
-        return c / (100 * h_new_geo * (1 + z)) * chi_new_flat(z, n_num, ind)
+        return c / (100 * h_new * (1 + z)) * chi_new_flat(z, n_num, ind)
 
 
 def b_new(z, n_num, ind):
@@ -4839,7 +4837,7 @@ def eq_diff(x, n_num, ind):
                 - 1.5
                 * n_num
                 * (1 + x[len(x) - 1]) ** 2
-                * (100 * h_new_geo) ** 2
+                * (100 * h_new) ** 2
                 / (H_new(x[len(x) - 1], n_num, ind) ** 2)
             )
         else:
@@ -4857,7 +4855,7 @@ def eq_diff(x, n_num, ind):
                 - 1.5
                 * Omega_m_new
                 * (1 + x[len(x) - 1]) ** 2
-                * (100 * h_new_geo) ** 2
+                * (100 * h_new) ** 2
                 / (H_new(x[len(x) - 1], n_num, ind) ** 2)
             )
         i = len(x) - 2
@@ -4896,7 +4894,7 @@ def eq_diff(x, n_num, ind):
                     - 1.5
                     * n_num
                     * (1 + x[i]) ** 2
-                    * (100 * h_new_geo) ** 2
+                    * (100 * h_new) ** 2
                     / (H_new(x[i], n_num, ind) ** 2)
                 )
             else:
@@ -4914,7 +4912,7 @@ def eq_diff(x, n_num, ind):
                     - 1.5
                     * Omega_m_new
                     * (1 + x[i]) ** 2
-                    * (100 * h_new_geo) ** 2
+                    * (100 * h_new) ** 2
                     / (H_new(x[i], n_num, ind) ** 2)
                 )
             i = i - 1
@@ -4953,7 +4951,7 @@ def eq_diff(x, n_num, ind):
                 - 1.5
                 * n_num
                 * (1 + x[len(x) - 1]) ** 2
-                * (100 * h_new_geo) ** 2
+                * (100 * h_new) ** 2
                 / (H_flat(x[len(x) - 1], n_num, ind) ** 2)
             )
         else:
@@ -4971,7 +4969,7 @@ def eq_diff(x, n_num, ind):
                 - 1.5
                 * Omega_m_new
                 * (1 + x[len(x) - 1]) ** 2
-                * (100 * h_new_geo) ** 2
+                * (100 * h_new) ** 2
                 / (H_flat(x[len(x) - 1], n_num, ind) ** 2)
             )
         i = len(x) - 2
@@ -5010,7 +5008,7 @@ def eq_diff(x, n_num, ind):
                     - 1.5
                     * n_num
                     * (1 + x[i]) ** 2
-                    * (100 * h_new_geo) ** 2
+                    * (100 * h_new) ** 2
                     / (H_flat(x[i], n_num, ind) ** 2)
                 )
             else:
@@ -5028,7 +5026,7 @@ def eq_diff(x, n_num, ind):
                     - 1.5
                     * Omega_m_new
                     * (1 + x[i]) ** 2
-                    * (100 * h_new_geo) ** 2
+                    * (100 * h_new) ** 2
                     / (H_flat(x[i], n_num, ind) ** 2)
                 )
             i = i - 1
@@ -5046,50 +5044,50 @@ def param_eq(x, n_num, ind):
                 y[i] = (
                     Omega_m_new
                     * (1 + x[i]) ** 3
-                    / ((H_new(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_new(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** gamma_new
             elif ind == 2:
                 y[i] = (
                     n_num
                     * (1 + x[i]) ** 3
-                    / ((H_new(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_new(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** gamma_new
             elif ind == 8:
                 y[i] = (
                     Omega_m_new
                     * (1 + x[i]) ** 3
-                    / ((H_new(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_new(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** n_num
             else:
                 y[i] = (
                     Omega_m_new
                     * (1 + x[i]) ** 3
-                    / ((H_new(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_new(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** gamma_new
         else:
             if ind == 1:
                 y[i] = (
                     Omega_m_new
                     * (1 + x[i]) ** 3
-                    / ((H_flat(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_flat(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** gamma_new
             elif ind == 2:
                 y[i] = (
                     n_num
                     * (1 + x[i]) ** 3
-                    / ((H_flat(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_flat(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** gamma_new
             elif ind == 8:
                 y[i] = (
                     Omega_m_new
                     * (1 + x[i]) ** 3
-                    / ((H_flat(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_flat(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** n_num
             else:
                 y[i] = (
                     Omega_m_new
                     * (1 + x[i]) ** 3
-                    / ((H_flat(x[i], n_num, ind) / 100 / h_new_geo) ** 2)
+                    / ((H_flat(x[i], n_num, ind) / 100 / h_new) ** 2)
                 ) ** gamma_new
         i = i + 1
     return y
@@ -5161,8 +5159,8 @@ if choice_F_NF == "F":
     )
     fs8_Functions = np.array(
         [
-            "f_sig8(tn, h_new_geo+eps_proj, 1)",
-            "f_sig8(tn, h_new_geo-eps_proj, 1)",
+            "f_sig8(tn, h_new+eps_proj, 1)",
+            "f_sig8(tn, h_new-eps_proj, 1)",
             "f_sig8(tn, Omega_m_new+eps_proj, 2)",
             "f_sig8(tn, Omega_m_new-eps_proj, 2)",
             "f_sig8(tn, w0+eps_proj, 5)",
@@ -5190,8 +5188,8 @@ if choice_F_NF == "NF":
     )
     fs8_Functions = np.array(
         [
-            "f_sig8(tn, h_new_geo+eps_proj, 1)",
-            "f_sig8(tn, h_new_geo-eps_proj, 1)",
+            "f_sig8(tn, h_new+eps_proj, 1)",
+            "f_sig8(tn, h_new-eps_proj, 1)",
             "f_sig8(tn, Omega_m_new+eps_proj, 2)",
             "f_sig8(tn, Omega_m_new-eps_proj, 2)",
             "f_sig8(tn, w0+eps_proj, 5)",
@@ -5361,7 +5359,7 @@ if choice_F_NF == "NF":
         therms = np.array(
             [
                 "Omega_b_new",
-                "h_new_geo",
+                "h_new",
                 "Omega_m_new",
                 "ns_new",
                 "Omega_L_new",
@@ -5370,7 +5368,6 @@ if choice_F_NF == "NF":
                 "sig_8_new",
                 "sig_p_new",
                 "sig_v_new",
-                "h_new_growth",
             ]
         )
         j, l, spsv_index = len(therms), len(therms), len(therms) - 1
@@ -5380,16 +5377,16 @@ if choice_F_NF == "NF":
             i = i + 1
 
         # Jacobian creation
-        J_wb        = [h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_b_new]
-        J_h_growth  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        J_wm        = [0, 0, h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_m_new]
-        J_ns        = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
-        J_sp        = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
-        J_sv        = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_wb = [h_new**2, 2 * h_new * Omega_b_new, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_h  = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_wm = [0, 2 * h_new * Omega_m_new, h_new**2, 0, 0, 0, 0, 0, 0, 0]
+        J_ns = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+        J_sp = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_sv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 
         while j < len(therms):
             J_wb = np.insert(J_wb, len(J_wb), 0)
-            J_h_growth  = np.insert(J_h_growth, len(J_h_growth), 0)
+            J_h  = np.insert(J_h, len(J_h), 0)
             J_wm = np.insert(J_wm, len(J_wm), 0)
             J_ns = np.insert(J_ns, len(J_ns), 0)
             J_sp = np.insert(J_sp, len(J_sp), 0)
@@ -5400,7 +5397,7 @@ if choice_F_NF == "NF":
         therms = np.array(
             [
                 "Omega_b_new",
-                "h_new_geo",
+                "h_new",
                 "Omega_m_new",
                 "ns_new",
                 "Omega_L_new",
@@ -5410,7 +5407,6 @@ if choice_F_NF == "NF":
                 "gamma_new",
                 "sig_p_new",
                 "sig_v_new",
-                "h_new_growth",
             ]
         )
         j, l, spsv_index = len(therms), len(therms), len(therms) - 1
@@ -5419,15 +5415,15 @@ if choice_F_NF == "NF":
             therms = np.insert(therms, len(therms), "Psho[" + str(i) + "]")
             i = i + 1
 
-        J_wb        = [h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_b_new]
-        J_h_growth  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        J_wm        = [0, 0, h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_m_new]
-        J_ns        = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
-        J_sp        = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
-        J_sv        = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_wb = [h_new**2, 2 * h_new * Omega_b_new, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_h  = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_wm = [0, 2 * h_new * Omega_m_new, h_new**2, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_ns = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+        J_sp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_sv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
         while j < len(therms):
             J_wb = np.insert(J_wb, len(J_wb), 0)
-            J_h_growth  = np.insert(J_h_growth, len(J_h_growth), 0)
+            J_h  = np.insert(J_h, len(J_h), 0)
             J_wm = np.insert(J_wm, len(J_wm), 0)
             J_ns = np.insert(J_ns, len(J_ns), 0)
             J_sp = np.insert(J_sp, len(J_sp), 0)
@@ -5440,7 +5436,7 @@ else:
         therms = np.array(
             [
                 "Omega_b_new",
-                "h_new_geo",
+                "h_new",
                 "Omega_m_new",
                 "ns_new",
                 "w0",
@@ -5448,7 +5444,6 @@ else:
                 "sig_8_new",
                 "sig_p_new",
                 "sig_v_new",
-                "h_new_growth",
             ]
         )
         j, l, spsv_index = len(therms), len(therms), len(therms) - 1
@@ -5457,15 +5452,15 @@ else:
             therms = np.insert(therms, len(therms), "Psho[" + str(i) + "]")
             i = i + 1
         # Jacobian creation
-        J_wb        = [h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_b_new]
-        J_h_growth  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        J_wm        = [0, 0, h_new_geo**2, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_m_new]
-        J_ns        = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-        J_sp        = [0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
-        J_sv        = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_wb = [h_new**2, 2 * h_new * Omega_b_new, 0, 0, 0, 0, 0, 0, 0]
+        J_h  = [0, 1, 0, 0, 0, 0, 0, 0, 0]
+        J_wm = [0, 2 * h_new * Omega_m_new, h_new**2, 0, 0, 0, 0, 0, 0]
+        J_ns = [0, 0, 0, 1, 0, 0, 0, 0, 0]
+        J_sp = [0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_sv = [0, 0, 0, 0, 0, 0, 0, 0, 1]
         while j < len(therms):
             J_wb = np.insert(J_wb, len(J_wb), 0)
-            J_h_growth  = np.insert(J_h_growth, len(J_h_growth), 0)
+            J_h  = np.insert(J_h, len(J_h), 0)
             J_wm = np.insert(J_wm, len(J_wm), 0)
             J_ns = np.insert(J_ns, len(J_ns), 0)
             J_sp = np.insert(J_sp, len(J_sp), 0)
@@ -5476,7 +5471,7 @@ else:
         therms = np.array(
             [
                 "Omega_b_new",
-                "h_new_geo",
+                "h_new",
                 "Omega_m_new",
                 "ns_new",
                 "w0",
@@ -5485,7 +5480,6 @@ else:
                 "gamma_new",
                 "sig_p_new",
                 "sig_v_new",
-                "h_new_growth",
             ]
         )
         j, l, spsv_index = len(therms), len(therms), len(therms) - 1
@@ -5494,15 +5488,15 @@ else:
             therms = np.insert(therms, len(therms), "Psho[" + str(i) + "]")
             i = i + 1
 
-        J_wb        = [h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_b_new]
-        J_h_growth  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        J_wm        = [0, 0, h_new_geo**2, 0, 0, 0, 0, 0, 0, 0, 2 * h_new_geo * Omega_m_new]
-        J_ns        = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
-        J_sp        = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
-        J_sv        = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_wb = [h_new**2, 2 * h_new * Omega_b_new, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_h  = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+        J_wm = [0, 2 * h_new * Omega_m_new, h_new**2, 0, 0, 0, 0, 0, 0, 0]
+        J_ns = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+        J_sp = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        J_sv = [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
         while j < len(therms):
             J_wb = np.insert(J_wb, len(J_wb), 0)
-            J_h_growth  = np.insert(J_h_growth, len(J_h_growth), 0)
+            J_h  = np.insert(J_h, len(J_h), 0)
             J_wm = np.insert(J_wm, len(J_wm), 0)
             J_ns = np.insert(J_ns, len(J_ns), 0)
             J_sp = np.insert(J_sp, len(J_sp), 0)
@@ -5572,7 +5566,7 @@ while i < len(Jacobian_m[0]):
     while j < len(Jacobian_m):
         if j == 0:
             Jacobian_m[j][i] = J_wb[i]
-            Jacobian_m[j + 1][i] = J_h_growth[i]
+            Jacobian_m[j + 1][i] = J_h[i]
             Jacobian_m[j + 2][i] = J_wm[i]
             Jacobian_m[j + 3][i] = J_ns[i]
             Jacobian_m[j + 4][i] = J_sp[i]
@@ -5590,19 +5584,6 @@ while i < len(Jacobian_m[0]):
     j = 0
     i = i + 1
 
-# Saving the Jacobian matrix.
-out_J = open("output/Jacobian_split", "w")
-i, j = 0, 0
-while i < len(Jacobian_m):
-    while j < len(Jacobian_m[0]):
-        out_J.write(str("%.10e" % Jacobian_m[i][j]))
-        out_J.write(" ")
-        j = j + 1
-    out_J.write("\n")
-    j = 0
-    i = i + 1
-out_J.close()
-
 F_new = np.dot(np.transpose(Jacobian_m), F_previous)
 F_new = np.dot(F_new, Jacobian_m)
 
@@ -5611,7 +5592,7 @@ therms_use = []
 therms_tmp = np.array(
     [
         "Omega_b_new",
-        "h_new_geo",
+        "h_new",
         "Omega_m_new",
         "ns_new",
         "Omega_L_new",
@@ -5621,7 +5602,6 @@ therms_tmp = np.array(
         "gamma_new",
         "sig_p_new",
         "sig_v_new",
-        "h_new_growth",
     ]
 )
 for i in range(len(zrange)):
@@ -5732,7 +5712,7 @@ if choice_L_NL == "SNL":
         therms_use = np.delete(therms_use, [1])
 
 if choice_F_NF == "F":
-    permutation = [2, 0, 4, 5, 1, 3, 6, 7]
+    permutation = [2, 0, 4, 5, 1, 3, 6]
     if proj_ODE_fit == "fit" and include_gamma == "Y":
         permutation = np.insert(permutation, len(permutation), len(permutation))
     if SpecSAF_elts["Usesp_ch"] == "0":
@@ -5745,7 +5725,7 @@ if choice_F_NF == "F":
     for i in range(len(zrange)):
         permutation = np.insert(permutation, len(permutation), tmp_per + (2 * i + 2))
 if choice_F_NF == "NF":
-    permutation = [2, 4, 0, 5, 6, 1, 3, 7, 8]
+    permutation = [2, 4, 0, 5, 6, 1, 3, 7]
     if proj_ODE_fit == "fit" and include_gamma == "Y":
         permutation = np.insert(permutation, len(permutation), len(permutation))
     if SpecSAF_elts["Usesp_ch"] == "0":
@@ -5785,7 +5765,7 @@ F_new = F_new[ind[0]]
 F_new = np.transpose(F_new)
 
 # Saving the spectroscopic Fisher matrix.
-out_F = open("output/Fisher_GCs_SpecSAF_split_v2", "w")
+out_F = open("output/Fisher_GCs_SpecSAF", "w")
 i, j = 0, 0
 while i < len(F_new):
     while j < len(F_new):

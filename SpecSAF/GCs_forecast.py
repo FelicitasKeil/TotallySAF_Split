@@ -401,7 +401,7 @@ def q_par(z, er_FH, er_FH_ref):
     return er_FH_ref / er_FH
 
 
-# Scale corrections for deviation from fiducial cosmology.
+# Scale corrections for deviation from fiducial cosmology. (AP effect)
 # See equ. 78 in Blanchard et al.
 def k(z, mu_ref, k_ref, er_FH, er_FH_ref, er_FDA, er_FDA_ref):
     return (
@@ -1503,23 +1503,35 @@ def der_H_7pts(
     sigV,
 ):
 
-    # Computing new k, mu coming from the AP effect (for the derivative of lnP_obs over lnH(z)).
-
+    # Computing new k, mu coming from the AP effect (for the derivative of lnP_obs over lnH(z).
+    k_H_up = k(z, mu_ref, k_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
+    k_H_up_2 = k(
+        z, mu_ref, k_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
+    )
+    k_H_up_3 = k(
+        z, mu_ref, k_ref, er_FH ** (1 + 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
+    )
     mu_H_up = mu(z, mu_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up_2 = mu(z, mu_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up_3 = mu(z, mu_ref, er_FH ** (1 + 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-
+    k_H_dw = k(z, mu_ref, k_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
+    k_H_dw_2 = k(
+        z, mu_ref, k_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
+    )
+    k_H_dw_3 = k(
+        z, mu_ref, k_ref, er_FH ** (1 - 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
+    )
     mu_H_dw = mu(z, mu_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw_2 = mu(z, mu_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw_3 = mu(z, mu_ref, er_FH ** (1 - 3 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
 
     return (
         -lnP_obs(
-            k_ref,
+            k_H_dw_3,
             mu_H_dw_3,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_dw_3)),
+            10 ** PM_NW(np.log10(k_H_dw_3)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - 3 * eps_H),
@@ -1531,11 +1543,11 @@ def der_H_7pts(
         )
         + 9
         * lnP_obs(
-            k_ref,
+            k_H_dw_2,
             mu_H_dw_2,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_dw_2)),
+            10 ** PM_NW(np.log10(k_H_dw_2)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - 2 * eps_H),
@@ -1547,11 +1559,11 @@ def der_H_7pts(
         )
         - 45
         * lnP_obs(
-            k_ref,
+            k_H_dw,
             mu_H_dw,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_dw)),
+            10 ** PM_NW(np.log10(k_H_dw)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - eps_H),
@@ -1563,11 +1575,11 @@ def der_H_7pts(
         )
         + 45
         * lnP_obs(
-            k_ref,
+            k_H_up,
             mu_H_up,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_up)),
+            10 ** PM_NW(np.log10(k_H_up)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + eps_H),
@@ -1579,11 +1591,11 @@ def der_H_7pts(
         )
         - 9
         * lnP_obs(
-            k_ref,
+            k_H_up_2,
             mu_H_up_2,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_up_2)),
+            10 ** PM_NW(np.log10(k_H_up_2)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + 2 * eps_H),
@@ -1594,11 +1606,11 @@ def der_H_7pts(
             sigV,
         )
         + lnP_obs(
-            k_ref,
+            k_H_up_3,
             mu_H_up_3,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_up_3)),
+            10 ** PM_NW(np.log10(k_H_up_3)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + 3 * eps_H),
@@ -1627,19 +1639,26 @@ def der_H_5pts(
     sigV,
 ):
 
+    k_H_up = k(z, mu_ref, k_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
+    k_H_up_2 = k(
+        z, mu_ref, k_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
+    )
     mu_H_up = mu(z, mu_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up_2 = mu(z, mu_ref, er_FH ** (1 + 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
-
+    k_H_dw = k(z, mu_ref, k_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
+    k_H_dw_2 = k(
+        z, mu_ref, k_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref
+    )
     mu_H_dw = mu(z, mu_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw_2 = mu(z, mu_ref, er_FH ** (1 - 2 * eps_H), er_FH_ref, er_FDA, er_FDA_ref)
 
     return (
         -lnP_obs(
-            k_ref,
+            k_H_up_2,
             mu_H_up_2,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_up_2)),
+            10 ** PM_NW(np.log10(k_H_up_2)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + 2 * eps_H),
@@ -1651,11 +1670,11 @@ def der_H_5pts(
         )
         + 8
         * lnP_obs(
-            k_ref,
+            k_H_up,
             mu_H_up,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_up)),
+            10 ** PM_NW(np.log10(k_H_up)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + eps_H),
@@ -1667,11 +1686,11 @@ def der_H_5pts(
         )
         - 8
         * lnP_obs(
-            k_ref,
+            k_H_dw,
             mu_H_dw,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_dw)),
+            10 ** PM_NW(np.log10(k_H_dw)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - eps_H),
@@ -1682,11 +1701,11 @@ def der_H_5pts(
             sigV,
         )
         + lnP_obs(
-            k_ref,
+            k_H_dw_2,
             mu_H_dw_2,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_dw_2)),
+            10 ** PM_NW(np.log10(k_H_dw_2)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - 2 * eps_H),
@@ -1715,16 +1734,18 @@ def der_H_3pts(
     sigV,
 ):
 
+    k_H_up = k(z, mu_ref, k_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
+    k_H_dw = k(z, mu_ref, k_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_up = mu(z, mu_ref, er_FH ** (1 + eps_H), er_FH_ref, er_FDA, er_FDA_ref)
     mu_H_dw = mu(z, mu_ref, er_FH ** (1 - eps_H), er_FH_ref, er_FDA, er_FDA_ref)
 
     return (
         lnP_obs(
-            k_ref,
+            k_H_up,
             mu_H_up,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_up)),
+            10 ** PM_NW(np.log10(k_H_up)),
             bias_s8,
             gf_s8,
             er_FH ** (1 + eps_H),
@@ -1735,11 +1756,11 @@ def der_H_3pts(
             sigV,
         )
         - lnP_obs(
-            k_ref,
+            k_H_dw,
             mu_H_dw,
             z,
-            10 ** PM(np.log10(k_ref)),
-            10 ** PM_NW(np.log10(k_ref)),
+            10 ** PM(np.log10(k_H_dw)),
+            10 ** PM_NW(np.log10(k_H_dw)),
             bias_s8,
             gf_s8,
             er_FH ** (1 - eps_H),
@@ -5583,6 +5604,19 @@ while i < len(Jacobian_m[0]):
     l = 0
     j = 0
     i = i + 1
+
+# Saving the Jacobian matrix.
+out_J = open("output/Jacobian_default", "w")
+i, j = 0, 0
+while i < len(Jacobian_m[0]):
+    while j < len(Jacobian_m):
+        out_J.write(str("%.10e" % Jacobian_m[j][i]))
+        out_J.write(" ")
+        j = j + 1
+    out_J.write("\n")
+    j = 0
+    i = i + 1
+out_J.close()
 
 F_new = np.dot(np.transpose(Jacobian_m), F_previous)
 F_new = np.dot(F_new, Jacobian_m)
